@@ -75,16 +75,8 @@ Environment       : Python 3.10+
 gan-cifar10-pytorch/
 │
 ├── 📂 data/                    # CIFAR-10 dataset (auto-downloaded)
-├── 📂 checkpoints/             # Saved model weights
-├── 📂 results/
-│   ├── generated_samples/      # Generated images per epoch
-│   └── loss_curves/            # Training loss plots
-│
+│    ├── generated_images/      # Generated images per epoch
 ├── 📄 gan_cifar10.py           # Main training script
-├── 📄 models.py                # Generator & Discriminator architectures
-├── 📄 utils.py                 # Helper functions
-├── 📄 config.py                # Hyperparameter configuration
-├── 📄 requirements.txt         # Python dependencies
 ├── 📄 README.md                # You are here!
 └── 📄 LICENSE                  # MIT License
 ```
@@ -158,7 +150,7 @@ The Generator learns to produce increasingly realistic images over time:
 
 | Epoch 1 | Epoch 4 | Epoch 7 | Epoch 10 |
 |---------|----------|----------|-----------|
-| ![](generated_images/generated_epoch_1.png) | ![](generated_images/generated_epoch_4.png) | ![](generated_images/generated_epoch_7.png) | ![](generated_images/generated_epoch_10.png) |
+| ![](GAN/generated_images/generated_epoch_1.png) | ![](generated_images/generated_epoch_4.png) | ![](generated_images/generated_epoch_7.png) | ![](generated_images/generated_epoch_10.png) |
 
 
 ---
