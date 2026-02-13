@@ -75,10 +75,15 @@ Environment       : Python 3.10+
 gan-cifar10-pytorch/
 │
 ├── 📂 data/                    # CIFAR-10 dataset (auto-downloaded)
-│    ├── generated_images/      # Generated images per epoch
-├── 📄 gan_cifar10.py           # Main training script
+├── 📂 generated-images/        # Generated images per epoch
+│   ├── generated_epoch_1.png
+│   ├── generated_epoch_2.png
+│   └── ...
+│
+├── 📄 new.py                   # Main training script
 ├── 📄 README.md                # You are here!
-└── 📄 LICENSE                  # MIT License
+├── 📄 requirements.txt         # Python dependencies
+└── 📄 .gitignore               # Git ignore file
 ```
 
 ---
@@ -117,28 +122,26 @@ pip install torch torchvision matplotlib numpy tqdm
 
 ### Basic Training
 ```bash
-python gan_cifar10.py
+python new.py
 ```
 
-### Custom Configuration
-```bash
-python gan_cifar10.py --epochs 100 --batch_size 128 --lr 0.0002
-```
+### What Happens During Training
 
-### Resume from Checkpoint
-```bash
-python gan_cifar10.py --resume checkpoints/gan_epoch_50.pth
-```
+1. **CIFAR-10 dataset** is automatically downloaded to `./data/`
+2. **Generator and Discriminator** networks are initialized
+3. **Training begins** with progress displayed in terminal
+4. **Generated images** are saved to `./generated-images/` after each epoch
+5. **Loss curves** are displayed and saved
 
-### Available Arguments
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--epochs` | 50 | Number of training epochs |
-| `--batch_size` | 64 | Training batch size |
-| `--lr` | 0.0002 | Learning rate for both networks |
-| `--latent_dim` | 100 | Dimension of latent noise vector |
-| `--device` | cuda | Device to use (cuda/cpu) |
-| `--save_interval` | 5 | Epochs between saving checkpoints |
+### Monitoring Progress
+
+During training, you'll see output like:
+```
+Epoch [1/50], Step [100/782], d_loss: 0.6523, g_loss: 1.2341
+Epoch [1/50], Step [200/782], d_loss: 0.5891, g_loss: 1.4567
+...
+Saved generated images: generated-images/generated_epoch_1.png
+```
 
 ---
 
@@ -146,12 +149,30 @@ python gan_cifar10.py --resume checkpoints/gan_epoch_50.pth
 
 ### Training Progress
 
-The Generator learns to produce increasingly realistic images over time:
+The Generator learns to produce increasingly realistic images over epochs:
 
-| Epoch 1 | Epoch 4 | Epoch 7 | Epoch 10 |
-|---------|----------|----------|-----------|
-| ![](GAN/generated_images/generated_epoch_1.png) | ![](generated_images/generated_epoch_4.png) | ![](generated_images/generated_epoch_7.png) | ![](generated_images/generated_epoch_10.png) |
+**Early Training (Epoch 1-5)**: Random noise patterns begin to form basic shapes
 
+**Mid Training (Epoch 10-25)**: Recognizable object structures emerge with colors
+
+**Late Training (Epoch 50+)**: Detailed, CIFAR-10-like images with clear object features
+
+> **Note**: Generated sample images will appear in the `generated-images/` folder after you run the training script. Below is what you can expect:
+
+```
+Epoch 1  →  Random colored noise
+Epoch 10 →  Blurry shapes and basic colors
+Epoch 25 →  Recognizable object outlines
+Epoch 50 →  Clear objects (cars, planes, animals)
+```
+
+### Example Generated Images
+
+Once trained, your `generated-images/` folder will contain files like:
+- `generated_epoch_1.png` - Initial random outputs
+- `generated_epoch_10.png` - Early feature learning
+- `generated_epoch_25.png` - Refined shapes
+- `generated_epoch_50.png` - High-quality generations
 
 ---
 
@@ -210,13 +231,19 @@ Output: Probability (Real/Fake)
 | **Loss Function** | Binary Cross Entropy | Standard GAN objective |
 | **Batch Size** | 64 | Balance between speed and stability |
 | **Latent Dimension** | 100 | Size of random noise input |
+| **Epochs** | 50 | Default training duration |
 
 ### Training Tips
 
-- **Mode Collapse**: If Generator produces same images, reduce learning rate
-- **Discriminator Too Strong**: Balance training by updating Generator more frequently
-- **Poor Quality**: Increase training epochs or adjust architecture depth
-- **Instability**: Try label smoothing (0.9 instead of 1.0 for real images)
+💡 **Mode Collapse**: If Generator produces same images, reduce learning rate or add noise to labels
+
+💡 **Discriminator Too Strong**: If G loss stays high, train Generator 2x per D update
+
+💡 **Poor Quality**: Increase training epochs to 100+ or adjust network depth
+
+💡 **Training Instability**: Try label smoothing (use 0.9 instead of 1.0 for real images)
+
+💡 **Slow Training**: Enable GPU with CUDA or reduce batch size
 
 ---
 
@@ -226,10 +253,10 @@ Output: Probability (Real/Fake)
 - [ ] Add **WGAN-GP** for improved training stability
 - [ ] Conditional GAN for class-specific generation
 - [ ] FID score calculation for quality metrics
-- [ ] TensorBoard integration for better visualization
+- [ ] TensorBoard integration for real-time monitoring
 - [ ] Progressive growing for higher resolution outputs
 - [ ] Mixed precision training for 2x speedup
-- [ ] Multi-GPU support via DataParallel
+- [ ] Model checkpointing and loading functionality
 
 ---
 
@@ -243,6 +270,24 @@ After completing this project, you will understand:
 ✅ **Image Processing**: Normalization, transformations, tensor operations  
 ✅ **Training Dynamics**: Loss interpretation, convergence patterns  
 ✅ **Debugging GANs**: Common failure modes and solutions  
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Q: Training is very slow**  
+A: Make sure you're using GPU. Check with `torch.cuda.is_available()`. If False, install CUDA-enabled PyTorch.
+
+**Q: Generator produces all black/white images**  
+A: This is mode collapse. Try reducing learning rate or adding label noise.
+
+**Q: Loss values seem wrong**  
+A: GAN losses don't decrease monotonically like classification. Oscillation is normal!
+
+**Q: Images not improving after 50 epochs**  
+A: Increase epochs to 100-200 or adjust architecture (add more layers/channels).
 
 ---
 
@@ -260,7 +305,7 @@ Contributions are welcome! Here's how you can help:
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - feel free to use it for learning and projects!
 
 ---
 
@@ -270,6 +315,19 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - **Radford et al.** - [DCGAN Paper (2015)](https://arxiv.org/abs/1511.06434)
 - **PyTorch Team** - [Official Documentation](https://pytorch.org/docs/)
 - **CIFAR-10** - [Dataset by Alex Krizhevsky](https://www.cs.toronto.edu/~kriz/cifar.html)
+
+---
+
+## 📖 References & Resources
+
+### Papers
+- [Original GAN Paper](https://arxiv.org/abs/1406.2661) - Goodfellow et al., 2014
+- [DCGAN Architecture](https://arxiv.org/abs/1511.06434) - Radford et al., 2015
+- [Improved GAN Training](https://arxiv.org/abs/1606.03498) - Salimans et al., 2016
+
+### Tutorials
+- [PyTorch GAN Tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
+- [Understanding GANs](https://towardsdatascience.com/understanding-generative-adversarial-networks-gans-cd6e4651a29)
 
 ---
 
@@ -283,7 +341,7 @@ Computer Science Student | Full Stack & AI Enthusiast
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/roshal-dsouza-571910228/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github)](https://github.com/roshaldsouza)
-[![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail)](mailto:your.roshalds789@gmail.com)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-orange?style=for-the-badge&logo=google-chrome)]([https://your-portfolio.com](https://resume-animator--roshalds789.replit.app))
 
 </div>
 
